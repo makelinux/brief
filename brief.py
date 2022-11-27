@@ -2,6 +2,7 @@
 
 import re
 import os
+import sys
 import fnmatch
 import argparse
 
@@ -38,6 +39,8 @@ def file_brief(file_path):
             t = re.sub(r'\s+', ' ', t)
             if t and len(res) < 80 and (comment or comment2):
                 res += (' ' if len(res) else '') + t
+            if args.debug:
+                print(len(res), res, len(t), t, comment, l, file=sys.stderr)
             if comment and re.match(r'.*\*/', l):
                 comment = False
     return file_path + ': ' + res
@@ -49,6 +52,8 @@ def brief(input='.',):
     ext = set('.h .c .S .hh hpp .cpp'.split())
     for path, dirs, files, _ in os.fwalk(input):
         path = re.sub(r'^\.\/', '', path)
+        if args.debug:
+            print(path, file=sys.stderr)
         for f in sorted(files):
             _, e = os.path.splitext(f)
             if e in ext:
@@ -63,7 +68,12 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument('-r', '--recursive', action='store_true',
                     help='scan subdirectories recursively')
+    ap.add_argument('-d', '--debug', action='store_true',
+                    help='trace debug information')
     args, rest_args = ap.parse_known_args()
+    if args.debug:
+        print(args, file=sys.stderr)
+        print(rest_args, file=sys.stderr)
     if not rest_args:
         brief()
     else:
