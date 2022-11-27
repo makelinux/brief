@@ -12,6 +12,10 @@ remove = "|".join([
     r'\s*\*/',          #  */
     r'^\s+',
     r'\s*\n$',
+    'SPDX.*',
+    r'\(C\).*|Copyright.*',
+    'All Rights Reserved.*',
+    'Written.*|Author.*|Rewritten.*',
 ])
 
 
