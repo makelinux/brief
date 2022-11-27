@@ -2,8 +2,10 @@
 
 import re
 import os
-import sys
 import fnmatch
+import argparse
+
+args = rest_args = None
 
 remove = "|".join([
     r'\s*//+\s*',       # //
@@ -53,7 +55,17 @@ def brief(input='.',):
                 if fnmatch.fnmatch(f, '*.mod.c'):
                     continue
                 print(file_brief(os.path.join(path, f)))
+        if not args.recursive:
+            break
 
 
 if __name__ == "__main__":
-    brief(sys.argv[1])
+    ap = argparse.ArgumentParser()
+    ap.add_argument('-r', '--recursive', action='store_true',
+                    help='scan subdirectories recursively')
+    args, rest_args = ap.parse_known_args()
+    if not rest_args:
+        brief()
+    else:
+        for i in rest_args:
+            brief(i)
