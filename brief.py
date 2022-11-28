@@ -27,6 +27,8 @@ def file_brief(file_path):
     n = 0
     _, fn = os.path.split(file_path)
     comment = False
+    finished = False
+    brief = False
     with open(file_path, 'r') as fo:
         while l := fo.readline():
             if m := re.search(r'MODULE_DESCRIPTION\("([^"]*)"\)', l):
@@ -37,11 +39,19 @@ def file_brief(file_path):
                 comment = True
             comment2 = re.match(r'\s*//', l)
             t = re.sub(remove, '', l, flags=re.IGNORECASE)
+            # extract the first doxygen brief
+            if m := re.search(r'[@\\]brief (.*)', t):
+                if not brief:
+                    brief = True
+                    res = ''
+                t = m.group(1)
             # remove filename
             t = re.sub('\S*' + re.escape(fn) + r'\b:?\s*-*\s*', '', t)
             t = re.sub(r'\s+', ' ', t)
-            if t and len(res) < 80 and (comment or comment2):
+            if t and not finished and len(res) < 80 and (comment or comment2):
                 res += (' ' if len(res) else '') + t
+            if res and not t:
+                finished = True
             if args.debug:
                 print(len(res), res, len(t), t, comment, l, file=sys.stderr)
             if comment and re.match(r'.*\*/', l):
