@@ -29,6 +29,9 @@ def file_brief(file_path):
     comment = False
     with open(file_path, 'r') as fo:
         while l := fo.readline():
+            if m := re.search(r'MODULE_DESCRIPTION\("([^"]*)"\)', l):
+                res = m.group(1)
+                break
             n += 1
             if not comment and re.match(r'\s*/\*', l):
                 comment = True
